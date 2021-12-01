@@ -1,0 +1,24 @@
+FROM kernel-builder AS builder
+WORKDIR /usr/src
+RUN curl -LO https://cdn.kernel.org/pub/linux/kernel/v5.x/linux-5.15.tar.xz \
+    && tar Jxf linux-5.15.tar.xz \
+    && rm -rf linux-5.15.tar.xz
+WORKDIR /usr/src/linux-5.15
+COPY config.txt /usr/src/linux-5.15/config.txt
+RUN make defconfig
+RUN make localyesconfig
+RUN ./scripts/kconfig/merge_config.sh .config config.txt
+RUN make mod2yesconfig
+RUN make bzImage
+
+FROM alpine:latest  
+RUN apk --no-cache add ca-certificates 
+COPY --from=builder /usr/src//linux-5.15/arch/x86/boot/bzImage /bzImage
+
+# make the almighty pause command
+RUN [ -e /pause.fifo ] || mkfifo /pause.fifo \
+    && echo '#!/bin/sh' > /pause \
+    && echo '</pause.fifo' >> /pause \
+    && chmod +x /pause
+
+CMD [ "/pause" ]
