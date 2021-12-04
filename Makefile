@@ -1,10 +1,10 @@
 CONTCLI=podman
 
 clean:
-	$(CONTCLI) rmi ezkernel
+	-$(CONTCLI) rmi ezkernel
 
 clean-all: clean
-	$(CONTCLI) rmi kernel-builder
+	-$(CONTCLI) rmi kernel-builder
 
 build:
 	$(CONTCLI) build -f Dockerfile.builder -t kernel-builder

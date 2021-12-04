@@ -4,10 +4,11 @@ RUN curl -LO https://cdn.kernel.org/pub/linux/kernel/v5.x/linux-5.15.tar.xz \
     && tar Jxf linux-5.15.tar.xz \
     && rm -rf linux-5.15.tar.xz
 WORKDIR /usr/src/linux-5.15
-COPY config.txt /usr/src/linux-5.15/config.txt
+#COPY config.txt /usr/src/linux-5.15/config.txt
 RUN make defconfig
-RUN make localyesconfig
-RUN ./scripts/kconfig/merge_config.sh .config config.txt
+COPY config.txt /usr/src/linux-5.15/.config
+#RUN make localyesconfig
+#RUN ./scripts/kconfig/merge_config.sh .config config.txt
 RUN make mod2yesconfig
 RUN make bzImage
 
